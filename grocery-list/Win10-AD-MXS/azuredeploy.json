@@ -57,15 +57,15 @@
         "adminUsername": {
             "type": "string",
             "metadata": {
-                "description": "Admin username for all Windows virtual machines."
+                "description": "Admin username for all virtual machines."
             }
         },
         "adminPassword": {
             "type": "securestring",
             "metadata": {
-                "description": "Password for the all Windows virtual machines. The password must be at least 8 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter"
+                "description": "Password for the all Virtual machines. The password must be at least 8 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter"
             },
-            "minLength": 12
+            "minLength": 8
         },
         "remoteAccessMode": {
             "type": "string",
@@ -81,7 +81,7 @@
         "allowedIPAddresses": {
             "type": "string",
             "metadata": {
-                "description": "The sourceAddressPrefixes allowed to connect to all the VMs in this deployment"
+                "description": "The sourceAddressPrefixes allowed to connect to this deployment. For example, your Home Public IP Address. If you choose the AzureBastionHost option in the 'remoteAccessMode' parameter, set this value to a wildcard * "
             }
         },
         "numberOfWorkstations": {
@@ -113,6 +113,16 @@
                 "description": "The Windows version for the Desktop VM. This will pick a fully patched image of this given Windows version."
             }
         },
+        "windowsServerSKU": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter",
+            "allowedValues": [
+                "2019-Datacenter"
+            ],
+            "metadata": {
+                "description": "The Windows version for the Server VM. This will pick a fully patched image of this given Windows version."
+            }
+        },
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_B2s",
@@ -127,6 +137,42 @@
             "metadata": {
                 "description": "Size of the virtual machine. Reference: https://docs.microsoft.com/en-us/azure/virtual-machines/sizes-general"
             }
+        },
+        "vmSizeMX": {
+            "type": "string",
+            "defaultValue": "Standard_B8ms",
+            "allowedValues": [
+                "Standard_A3",
+                "Standard_A4",
+                "Standard_B4ms",
+                "Standard_B8ms",
+                "Standard_A4_v2",
+                "Standard_A8_v2"
+            ],
+            "metadata": {
+                "description": "Size of the MX virtual machine. Reference: https://docs.microsoft.com/en-us/azure/virtual-machines/sizes-general"
+            }
+        },
+        "mxsRelease": {
+            "type": "string",
+            "defaultValue": "MXS2016-x64-CU12-KB4471392",
+            "allowedValues": [
+                "MXS2016-x64-CU19-KB4588884",
+                "MXS2016-x64-CU18-KB4571788",
+                "MXS2016-x64-CU17-KB4556414",
+                "MXS2016-x64-CU16-KB4537678",
+                "MXS2016-x64-CU15-KB4522150",
+                "MXS2016-x64-CU14-KB4514140",
+                "MXS2016-x64-CU13-KB4488406",
+                "MXS2016-x64-CU12-KB4471392"
+            ]
+        },
+        "domainFQDN": {
+            "type": "string",
+            "metadata": {
+                "description": "The FQDN of the Active Directory Domain to be created"
+            },
+            "defaultValue": "azsentinel.local"
         },
         "securityCollectionTier": {
             "type": "string",
@@ -148,17 +194,10 @@
             },
             "defaultValue": [
                 "System",
+                "Application",
                 "Microsoft-Windows-Sysmon/Operational",
-                "Microsoft-Windows-TerminalServices-RemoteConnectionManager/Operational",
-                "Microsoft-Windows-Bits-Client/Operational",
-                "Microsoft-Windows-TerminalServices-LocalSessionManager/Operational",
                 "Directory Service",
-                "Microsoft-Windows-DNS-Client/Operational",
-                "Microsoft-Windows-Windows Firewall With Advanced Security/Firewall",
-                "Windows PowerShell",
-                "Microsoft-Windows-PowerShell/Operational",
-                "Microsoft-Windows-WMI-Activity/Operational",
-                "Microsoft-Windows-TaskScheduler/Operational"
+                "MSExchange Management"
             ]
         },
         "enableSysmon": {
@@ -168,29 +207,12 @@
                 "description": "Do you want to install Sysmon on the endpoint?"
             }
         },
-        "c2Framework": {
-            "type": "string",
-            "defaultValue": "None",
-            "allowedValues": [
-                "None",
-                "empire",
-                "covenant",
-                "metasploit"
-            ],
+        "enableAADConnect": {
+            "type": "bool",
             "metadata": {
-                "description": "C2 framework to deploy"
-            }
-        },
-        "ubuntuSKU": {
-            "type": "string",
-            "defaultValue": "18.04-LTS",
-            "allowedValues": [
-                "18.04-LTS",
-                "19.04"
-            ],
-            "metadata": {
-                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
-            }
+                "description": "Do you want to want download the AADConnect installer and get it ready to set up after the deployment?"
+            },
+            "defaultValue": false
         },
         "location": {
             "type": "string",
@@ -233,32 +255,14 @@
                         "value": [
                             "Sysmon"
                         ]
-                    }
-                }
-            }
-        },
-        {
-            "name": "enableSecurityEventDataConnector",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "dependsOn": [
-                "deployAzureSentinel2Go"
-            ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[uri(variables('artifactsAzureSentinel2Go'), 'azure-sentinel/linkedtemplates/data-connectors/securityEvents.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "workspaceName": {
-                        "value": "[if(empty(parameters('workspaceId')), reference('deployAzureSentinel2Go').outputs.workspaceName.value, parameters('workspaceName'))]"
+                    },
+                    "enableDataConnectorsKind": {
+                        "value": [
+                            "SecurityInsightsSecurityEventCollectionConfiguration"
+                        ]
                     },
                     "securityCollectionTier": {
                         "value": "[parameters('securityCollectionTier')]"
-                    },
-                    "location": {
-                        "value": "[parameters('location')]"
                     }
                 }
             }
@@ -291,7 +295,7 @@
             }
         },
         {
-            "name": "deployWin10VM",
+            "name": "collectIISLogs",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
             "dependsOn": [
@@ -300,7 +304,30 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(variables('artifactsBlacksmith'), 'templates/azure/Win10/azuredeploy.json')]",
+                    "uri": "[uri(variables('artifactsAzureSentinel2Go'),'azure-sentinel/linkedtemplates/log-analytics/iisLogsDataSource.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "workspaceName": {
+                        "value": "[if(empty(parameters('workspaceId')), reference('deployAzureSentinel2Go').outputs.workspaceName.value, parameters('workspaceName'))]"
+                    },
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "deployWinADMXS",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "dependsOn": [
+                "deployAzureSentinel2Go"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(variables('artifactsBlacksmith'), 'templates/azure/Win10-AD-MXS/azuredeploy.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -319,8 +346,20 @@
                     "windowsDesktopSKU": {
                         "value": "[parameters('windowsDesktopSKU')]"
                     },
+                    "windowsServerSKU": {
+                        "value": "[parameters('windowsServerSKU')]"
+                    },
                     "vmSize": {
                         "value": "[parameters('vmSize')]"
+                    },
+                    "vmSizeMX": {
+                        "value": "[parameters('vmSizeMX')]"
+                    },
+                    "mxsRelease": {
+                        "value": "[parameters('mxsRelease')]"
+                    },
+                    "domainFQDN": {
+                        "value": "[parameters('domainFQDN')]"
                     },
                     "remoteAccessMode": {
                         "value": "[parameters('remoteAccessMode')]"
@@ -334,6 +373,9 @@
                     "enableSysmon": {
                         "value": "[parameters('enableSysmon')]"
                     },
+                    "enableAADConnect": {
+                        "value": "[parameters('enableAADConnect')]"
+                    },
                     "workspaceId": {
                         "value": "[if(empty(parameters('workspaceId')), reference('deployAzureSentinel2Go').outputs.workspaceIdOutput.value, parameters('workspaceId'))]"
                     },
@@ -343,88 +385,6 @@
                     "location": {
                         "value": "[parameters('location')]"
                     }
-                }
-            }
-        },
-        {
-            "condition": "[not(equals(parameters('c2Framework'), 'None'))]",
-            "name": "deployC2",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[uri(variables('artifactsBlacksmith'), 'templates/azure/C2/azuredeploy.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "adminUsername": {
-                        "value": "[parameters('adminUsername')]"
-                    },
-                    "authenticationType": {
-                        "value": "password"
-                    },
-                    "adminPasswordOrKey": {
-                        "value": "[parameters('adminPassword')]"
-                    },
-                    "vmName": {
-                        "value": "C2001"
-                    },
-                    "ubuntuSKU": {
-                        "value": "[parameters('ubuntuSKU')]"
-                    },
-                    "vmSize": {
-                        "value": "[parameters('vmSize')]"
-                    },
-                    "remoteAccessMode": {
-                        "value": "[parameters('remoteAccessMode')]"
-                    },
-                    "allowedIPAddresses": {
-                        "value": "[parameters('allowedIPAddresses')]"
-                    },
-                    "c2Framework": {
-                        "value": "[parameters('c2Framework')]"
-                    }
-                }
-            }
-        },
-        {
-            "condition": "[not(equals(parameters('c2Framework'), 'None'))]",
-            "name": "vnet-c2/peering-to-remote-vnet-win",
-            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-            "apiVersion": "2019-11-01",
-            "dependsOn": [
-                "deployC2",
-                "deployWin10VM"
-            ],
-            "location": "[parameters('location')]",
-            "properties": {
-                "allowVirtualNetworkAccess": true,
-                "allowForwardedTraffic": false,
-                "allowGatewayTransit": false,
-                "useRemoteGateways": false,
-                "remoteVirtualNetwork": {
-                    "id": "[reference('deployWin10VM').outputs.virtualNetworkId.value]"
-                }
-            }
-        },
-        {
-            "condition": "[not(equals(parameters('c2Framework'), 'None'))]",
-            "name": "vnet-win/peering-to-remote-vnet-c2",
-            "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
-            "apiVersion": "2019-11-01",
-            "dependsOn": [
-                "deployC2",
-                "deployWin10VM"
-            ],
-            "location": "[parameters('location')]",
-            "properties": {
-                "allowVirtualNetworkAccess": true,
-                "allowForwardedTraffic": false,
-                "allowGatewayTransit": false,
-                "useRemoteGateways": false,
-                "remoteVirtualNetwork": {
-                    "id": "[if(not(equals(parameters('c2Framework'), 'None')), reference('deployC2').outputs.virtualNetworkId.value, 'Resource not deployed')]"
                 }
             }
         }

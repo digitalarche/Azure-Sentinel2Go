@@ -1,7 +1,7 @@
 # Azure Sentinel + Win10 + Palo Alto Networks VM-Series Firewall
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2Fwin10-PAN-FW%2Fazuredeploy.json)
-[![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2Fwin10-PAN-FW%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2FWin10-PAN-FW%2Fazuredeploy.json)
+[![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2FWin10-PAN-FW%2Fazuredeploy.json)
 
 ## Grocery Items
 
@@ -37,6 +37,7 @@ For both AWS and Microsoft Azure, the licensing options are bring your own licen
 ## Accept Azure VM Marketplace Terms (MUST DO)
 
 * The Palo Alto Networks (PAN) VM-Series Firewall is deployed from Azure Marketplace. You need to accept the legal terms to use the VM.
+* You must have authorization to perform action `Microsoft-MarketPlaceOrdering/offerTypes/publishers/offers/plans/agreements/write` over scope `subscription`.
 * **Make sure you run the commands below before deploying this template**
 * You can do it locally via [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) or via the [Azure Clould Shell](https://shell.azure.com/). 
 

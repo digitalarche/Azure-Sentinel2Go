@@ -1,7 +1,7 @@
 # Windows 10 + Windows Server (Active Directory) + Windows Server (Active Directory Federation Services)
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2Fwin10-AD-ADFS%2Fazuredeploy.json)
-[![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2Fwin10-AD-ADFS%2Fazuredeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2FWin10-AD-ADFS%2Fazuredeploy.json)
+[![Deploy to Azure Gov](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOTRF%2FAzure-Sentinel2Go%2Fmaster%2Fgrocery-list%2FWin10-AD-ADFS%2Fazuredeploy.json)
 
 ## Grocery Items
 
@@ -32,9 +32,9 @@
     * Azure Active Directory (AAD) Connect installed
 * Windows 10 Workstations (Max. 10)
 * Windows [Microsoft Monitoring Agent](https://docs.microsoft.com/en-us/services-hub/health/mma-setup) installed
-    * It connects to the Microsoft Log Analytics workspace define in the template.
+    * It connects to the Azure Sentinel Log Analytics workspace defined in the template.
 * SecurityEvents data connector enabled
-* Windows event providers enabled
+* Windows event channels enabled
     * `System`
     * `Microsoft-Windows-Sysmon/Operational`
     * `Directory Service`
